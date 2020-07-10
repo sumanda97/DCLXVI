@@ -44,8 +44,7 @@ def getKitsu(mal):
     link = f"https://kitsu.io/api/edge/mappings?filter[external_site]=myanimelist/anime&filter[external_id]={mal}"
     result = requests.get(link).json()["data"][0]["id"]
     link = f"https://kitsu.io/api/edge/mappings/{result}/item?fields[anime]=slug"
-    kitsu = requests.get(link).json()["data"]["id"]
-    return kitsu
+    return requests.get(link).json()["data"]["id"]
 
 
 def getBannerLink(mal, kitsu_search=True):
@@ -535,7 +534,7 @@ async def whatanime(e):
         await e.edit("`Media required`")
         return
     ig = is_gif(media) or is_video(media)
-    if not is_image(media) and not ig:
+    if not (is_image(media) or ig):
         await e.edit("`Media must be an image or gif or video`")
         return
     filename = "file.jpg"
@@ -606,10 +605,8 @@ def is_gif(file):
     # lazy to go to github and make an issue kek
     if not is_video(file):
         return False
-    if DocumentAttributeAnimated() not in getattr(
-            file, "document", file).attributes:
-        return False
-    return True
+    return DocumentAttributeAnimated() in getattr(
+            file, "document", file).attributes
 
 
 CMD_HELP.update(
